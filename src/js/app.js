@@ -86,7 +86,10 @@ const render = (d1) => {
         });
     });
 
-    drawNext(keys[0], keys[0]);
+    window.requestAnimationFrame(() => {
+        drawNext(keys[0], keys[0]);
+    });
+    
     window.requestAnimationFrame(checkScroll);
 }
 
@@ -192,7 +195,6 @@ const doScrollAction = (i) => {
 
 function drawNext(keyFrom, keyTo) {
     // context.clearRect(0,0, width, height);
-
     let startT = null;
     let animationDuration = 3000;
 
@@ -204,8 +206,21 @@ function drawNext(keyFrom, keyTo) {
         context.clearRect(0, 0, width, height);
 
         for (var i = 0; i < data.length; i++) {
+            // if(keyFrom === keyTo) {
+            //     data[i].x = interp(width/2, data[i].layout[keyTo].x, easedP);
+            //     data[i].y = interp(height/2, data[i].layout[keyTo].y, easedP);
+            // } else {
+            if(keyFrom === keyTo) {
+                context.globalAlpha = easedP;
+            }
             data[i].x = interp(data[i].layout[keyFrom].x, data[i].layout[keyTo].x, easedP);
             data[i].y = interp(data[i].layout[keyFrom].y, data[i].layout[keyTo].y, easedP);
+            // }
+
+            // if(i === 10 && keyFrom === keyTo) {
+            //     console.log(data[i].x);
+            //     console.log(data[i].y);
+            // } 
 
             if(data[i].Fatal === "Yes") {
                 context.fillStyle = colours.guNewsKicker;
