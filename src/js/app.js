@@ -1,4 +1,17 @@
-import * as d3 from "d3"
+import * as d3Array from "d3-array"
+import * as d3Select from "d3-selection"
+import * as d3Scale from "d3-scale"
+import * as d3Shape from "d3-shape"
+import * as d3Transition from "d3-transition"
+import * as d3Ease from "d3-ease"
+import * as d3Fetch from "d3-fetch"
+import * as d3Format from "d3-format"
+import { event as d3event } from "d3-selection"
+import * as d3Collection from "d3-collection"
+import * as d3Axis from "d3-axis"
+
+const d3 = Object.assign({}, d3Array, d3Axis, d3Collection, d3Fetch, d3Select, d3Scale, d3Shape, d3Transition, d3Ease, d3Format);
+
 import colours from "./palette"
 import labels from "../assets/labels.json"
 var commafy = require('commafy');
@@ -20,8 +33,8 @@ const circleScaler = Math.min((width/1300), (height/1008))
 let yPadding = 0;
 let xPadding = 0;
 
-if(height > circleScaler*1008) {
-    yPadding = Math.round((height - (circleScaler*1008))/2);
+if(height > circleScaler*1040) {
+    yPadding = Math.round((height - (circleScaler*1040))/2);
 }
 
 const r = 2 * (circleScaler);
