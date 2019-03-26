@@ -1,49 +1,47 @@
 <div class="interactive-wrapper">
     <div class="int-tag">12 months on</div>
-    <h1><span>Life in Gaza following the “Great March of Return” protests</span></h1>
-    <p class="standfirst">In pellentesque arcu et ex accumsan, non interdum justo pellentesque. Nunc congue, mauris ut pretium lacinia, felis nisi congue ex, eget eleifend dui libero sed ex.</p>
-    <p>Suspendisse potenti. Maecenas velit urna, interdum eget elit eu, tempor tincidunt lacus. Sed eu rutrum ante, eget vestibulum nulla. Sed ac nisi non lorem lobortis aliquam. Integer nec orci vitae mi pharetra mollis. Fusce a tortor id lectus tempus ornare. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec sit amet enim nec enim interdum congue.</p>
-    <p>In pellentesque arcu et ex accumsan, non interdum justo pellentesque. Nunc congue, mauris ut pretium lacinia, felis nisi congue ex, eget eleifend dui libero sed ex. Aliquam tempor, nisl vitae posuere dignissim, libero purus dictum tellus, ac fermentum elit quam a quam. </p>
+    <h1><span>{{{headline}}}</span></h1>
+    <p class="standfirst">{{{standfirst}}}</p>
+    <div class="int-byline"><a href="https://www.theguardian.com/profile/oliver-holmes">Oliver Holmes</a> and <a href="https://www.theguardian.com/profile/josh-holder">Josh Holder</a>
+        <div class="int-date">Wed 30 Jan 2019 11.00 GMT</div>
+    </div>
+    {{#topText}}
+        <p>{{{.}}}</p>
+    {{/topText}}
     <div class="scroll-wrapper">
         <div class="scroll-inner"> 
             
         </div>  
         <div class="scroll-text"> 
-            <div class="scroll-text__inner">
-                <div class="scroll-text__div">
-                    <img src="https://media.guim.co.uk/087af56b5b456a52eec220d2421aaabc58b252de/0_85_5472_3283/500.jpg">
-                    <div class="vote-title">Almost 27,000 Palestinians have been injured since the protests began and more than 180 killed</div>
-                    <p>Each grey circle here represents one Palestinian injured since 1 April 2018, <span style="color: #c70000">red</span> circles highlight those who have been killed</p>
-                </div> 
-            </div>
-            <div class="scroll-text__inner">
-                <div class="scroll-text__div">
-                    <img src="https://media.guim.co.uk/c7c490f383e1d98e6b779248f6f5941cb57f9562/0_140_4200_2520/500.jpg">
-                    <div class="vote-title">Women and children make up almost 30% of those injured and killed</div>
-                    <p>Amongst those killed was 15-year-old Youssef Al-Daya, who was shot by the Israeli army during the 'Great March of Return' protests on 22 February.</p>
-                </div> 
-            </div>
-            <div class="scroll-text__inner">
-                <div class="scroll-text__div">
-                    <img src="https://media.guim.co.uk/b2044e48a6fa3bc5a4e497161d41aac7d8818ab3/0_342_5472_3283/500.jpg">
-                    <div class="vote-title">May 2018 was the bloodiest month since the protests began, with more than 6,000 Palestinians injured or killed</div>
-                    <p>Pictured is a Palestinian protester using a slingshot to hurl stones at Israeli troops in May 2018</p> 
-                </div> 
-            </div>
-            <div class="scroll-text__inner">
-                <div class="scroll-text__div">
-                    <img src="https://media.guim.co.uk/4c6accaa6d2ea8111febd7af54e3b82be87d51a5/0_0_3200_2202/500.jpg">
-                    <div class="vote-title">Palestinians have been killed by live ammunition, shrapnel and tear gas canisters</div>
-                    <p>Palestinian cyclist Alaa Al-Daly (pictured) lost his leg by a bullet fired by Israeli soldiers along the Gaza border in a demonstration</p>
-                </div>
-            </div>
+            {{#scrollCards}}
+                <div class="scroll-text__inner">
+                    <div class="scroll-text__div">
+                        <img src="{{imgSrc}}">
+                        <div class="vote-title">{{title}}</div>
+                        <p>{{{standfirst}}}</p>
+                        <div class="img-src">{{imgSrcText}}</div>
+                    </div> 
+                </div>  
+            {{/scrollCards}} 
         </div>
     </div>
-    <p>In pellentesque arcu et ex accumsan, non interdum justo pellentesque. Nunc congue, mauris ut pretium lacinia, felis nisi congue ex, eget eleifend dui libero sed ex. Aliquam tempor, nisl vitae posuere dignissim, libero purus dictum tellus, ac fermentum elit quam a quam. </p>
-    <p>In pellentesque arcu et ex accumsan, non interdum justo pellentesque. Nunc congue, mauris ut pretium lacinia, felis nisi congue ex, eget eleifend dui libero sed ex. Aliquam tempor, nisl vitae posuere dignissim, libero purus dictum tellus, ac fermentum elit quam a quam. </p>
-    <h2>How has life in Gaza changed since January 2017?</h2>
-    <p>In pellentesque arcu et ex accumsan, non interdum justo pellentesque. Nunc congue, mauris ut pretium lacinia, felis nisi congue ex, eget eleifend dui libero sed ex. Aliquam tempor, nisl vitae posuere dignissim, libero purus dictum tellus, ac fermentum elit quam a quam. </p>
-    <div class="line-charts"></div>
-    <p>In pellentesque arcu et ex accumsan, non interdum justo pellentesque. Nunc congue, mauris ut pretium lacinia, felis nisi congue ex, eget eleifend dui libero sed ex. Aliquam tempor, nisl vitae posuere dignissim, libero purus dictum tellus, ac fermentum elit quam a quam. </p>
-    <p>In pellentesque arcu et ex accumsan, non interdum justo pellentesque. Nunc congue, mauris ut pretium lacinia, felis nisi congue ex, eget eleifend dui libero sed ex. Aliquam tempor, nisl vitae posuere dignissim, libero purus dictum tellus, ac fermentum elit quam a quam. </p>
+    {{#bottomText}}
+        <p>{{{.}}}</p>
+    {{/bottomText}}
+    <h2>How has life in Gaza changed since the protests began?</h2>
+    {{#lineChartText}}
+        <p>{{{.}}}</p>
+    {{/lineChartText}}
+    <div class="line-charts">
+        {{#lineCharts}}
+            <div class="line-wrapper">
+                <h3>{{title}}</h3>
+                <div class="inner">
+
+                </div>
+                <p>{{words}}</p>
+                <div class="source">{{source}}</div>
+            </div>
+        {{/lineCharts}}
+    </div>
 </div>

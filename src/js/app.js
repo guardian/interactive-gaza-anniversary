@@ -1,5 +1,6 @@
 import * as d3 from "d3"
 import colours from "./palette"
+import labels from "../assets/labels.json"
 var commafy = require('commafy');
 
 const container = d3.select(".scroll-inner");
@@ -7,16 +8,26 @@ const container = d3.select(".scroll-inner");
 const pixelRatio = window.devicePixelRatio;
 const vertical = (window.innerHeight > window.innerWidth);
 const scaledWidth = d3.select(".scroll-inner").node().clientWidth * pixelRatio;
-const scaledHeight = (vertical) ? scaledWidth : d3.select(".scroll-inner").node().clientHeight * pixelRatio;  
+const scaledHeight = (vertical) ? scaledWidth*0.80 : d3.select(".scroll-inner").node().clientHeight * pixelRatio;  
 
 const width = scaledWidth/pixelRatio;
 const height = scaledHeight/pixelRatio;  
 
-const r = 2 * (width/1260);
-const padding = 0.25 * (width/1260);
+// const verticalPadding = (
+
+const circleScaler = Math.min((width/1300), (height/1008))
+
+let yPadding = 0;
+let xPadding = 0;
+
+if(height > circleScaler*1008) {
+    yPadding = Math.round((height - (circleScaler*1008))/2);
+}
+
+const r = 2 * (circleScaler);
+const padding = 0.25 * circleScaler;
 
 const keys = ["injuredKilled", "life", "monthYear", "Weapon"]
-let labels = {};
 
 let context;
 let data;
@@ -36,75 +47,7 @@ const render = (d1) => {
     context.scale(pixelRatio, pixelRatio);
     // context.translate(width / 2, height / 2);
 
-    const layouts = keys.map(key => {
-        const keyToNestBy = key;
-
-        const headers = [
-            {"name": "root", value: ""}
-        ];
-
-        (d3.nest().key(d => d[keyToNestBy]).entries(data)).forEach(v => {
-            headers.push({"name": v.key, "value": "root"});
-        });
-
-        if(key === "monthYear") {
-            (d3.nest().key(d => d["Date"]).entries(data)).forEach(v => {
-                headers.push({"name": v.key, "value": v.values[0].monthYear})
-            });
-        }
-
-        const hierarchyData = d3.stratify()
-            .id((d, i) => d.name)
-            .parentId((d, i) => (d.value) ? d.value : (key === "monthYear") ? d["Date"] : d[keyToNestBy])(headers.concat(d3.shuffle(data).filter(v => v.Month !== undefined))); 
-
-            // .parentId((d, i) => (d.value) ? d.value : d.Weapon)(headers.concat(data.filter(v => v.Month !== undefined))); 
-        const pack = d3.pack()
-            .size([width, height])
-            .radius(d => d.value * (r+padding))
-                (d3.hierarchy(hierarchyData)
-                    .count(d => d.value)
-                    .sort((a, b) => b.value - a.value ));
-
-        const leaves = pack.leaves();
-
-        if(key === "monthYear") {
-            console.log(pack.children);
-            labels[key] = [];
-            pack.children.forEach((c) => {
-                labels[key] = labels[key].concat(c.children)
-            }); 
-            labels[key] = labels[key].concat(pack.children);
-        } else {
-            labels[key] = pack.children;
-        }
- 
-        return leaves;
-    });
-
-    let dataObject = {};
-
-    data.forEach(d => {
-        dataObject[d.name] = d;
-    });
-
-    layouts.forEach((layout, z) => {
-        layout.forEach(n => {
-            if(!dataObject[n.data.id].layout) {
-                dataObject[n.data.id].layout = {}
-            }
-            if(!dataObject[n.data.id].layout[keys[z]]) {
-                dataObject[n.data.id].layout[keys[z]] = {}; 
-            }
-            // if(keys[z] === "monthYear") {
-            //     const splitDate = dataObject[n.data.id].Date.split("/")
-            //     dataObject[n.data.id].layout[keys[z]].x = Math.random()*width;
-            //     dataObject[n.data.id].layout[keys[z]].y = yScale(new Date(splitDate[1] + "/" + splitDate[0] + "/" + splitDate[2]));
-            // } else {
-            dataObject[n.data.id].layout[keys[z]].x = n.x;
-            dataObject[n.data.id].layout[keys[z]].y = n.y;
-            // }
-        });
-    });
+    //data here
 
     window.requestAnimationFrame(() => {
         drawNext(keys[0], keys[0]);
@@ -219,113 +162,113 @@ function drawNext(keyFrom, keyTo) {
     let startT = null;
     let animationDuration = 3000;
     let currentColour = null;
+
+    // const offscreenCanvas = document.createElement('canvas');
+    // offscreenCanvas.width = r;
+    // offscreenCanvas.height = r;
+
+    // const ctx = offscreenCanvas.getContext("2d");
+    
+    // ctx.fillStyle = colours.neutral60;
+    // ctx.fillRect(0, 0, r, r);
+
+    const fatalData = data.filter((d, i) => d.injuredKilled === "Killed");
+    const injuredData = data.filter((d, i) => d.injuredKilled === "Injured");
+
     function draw(p) {
         // context.fillStyle = colours.newsRed;
-        const easedP = ease(p);
+        const easedP = d3.easeExpOut(p, 0.5);
         const easedPlabels = labelEase(p);
         context.save();
         context.clearRect(0, 0, width, height);
-        context.fillStyle = colours.neutral60; 
-        for (var i = 0; i < data.length; i++) {
-            // if(keyFrom === keyTo) {
-            //     data[i].x = interp(width/2, data[i].layout[keyTo].x, easedP);
-            //     data[i].y = interp(height/2, data[i].layout[keyTo].y, easedP);
-            // } else {
-                
-            if(keyFrom === keyTo) {
-                context.globalAlpha = easedP;
-            }
-            
-            data[i].x = interp(data[i].layout[keyFrom].x, data[i].layout[keyTo].x, easedP);
-            data[i].y = interp(data[i].layout[keyFrom].y, data[i].layout[keyTo].y, easedP);
-            // }
 
-            // if(i === 10 && keyFrom === keyTo) {
-            //     console.log(data[i].x);
-            //     console.log(data[i].y);
-            // } 
-
-            if(data[i].Fatal === "Yes") {
-                if(currentColour !== colours.newsRed) {
-                    context.fillStyle = colours.newsRed;
-                    currentColour = colours.newsRed;
-                }
-            } else {
-                if(currentColour !== colours.neutral60) {
-                    context.fillStyle = colours.neutral60;
-                    currentColour = colours.neutral60;
-                }
-            } 
+        context.fillStyle = colours.newsRed;
+        context.beginPath();
+        if(keyFrom === keyTo) {
+            context.globalAlpha = easedP;
+        }
+        for (var i = 0; i < fatalData.length; i++) {
+            fatalData[i].x = interp(fatalData[i].layout[keyFrom].x, fatalData[i].layout[keyTo].x, easedP);
+            fatalData[i].y = interp(fatalData[i].layout[keyFrom].y, fatalData[i].layout[keyTo].y, easedP);
  
-            context.fillRect(data[i].x, data[i].y, r, r);
-            // context.beginPath();
-            // context.arc(data[i].x,data[i].y,r/2,0,Math.PI*2)
-            // context.fill()
+            context.rect(fatalData[i].x * (circleScaler), (fatalData[i].y * (circleScaler)) + yPadding, r, r);
+        }
+        context.fill();
+        context.closePath();
+        
+
+        context.fillStyle = colours.neutral60;
+
+        if(keyFrom === keyTo) {
+            context.globalAlpha = easedP;
         }
 
+        context.beginPath();
+
+        for (var i = 0; i < injuredData.length; i++) { 
+            // injuredData[i].x = interp(injuredData[i].layout[keyFrom].x, injuredData[i].layout[keyTo].x, easedP);
+            // injuredData[i].y = interp(injuredData[i].layout[keyFrom].y, injuredData[i].layout[keyTo].y, easedP);
+
+            const interped = interpXY(injuredData[i].layout[keyFrom], injuredData[i].layout[keyTo], easedP)
+            
+            context.rect(interped[0]* (circleScaler), (interped[1]* (circleScaler)) + yPadding, r, r);
+        }
+        context.fill();
+        context.closePath();
         for(var i = 0; i < labels[keyTo].length; i++) {
             const label = labels[keyTo][i];
             const fontScale = (width < 960) ? 0.75 : 1;
-            if(label.children.length > 50 || keyTo === "monthYear") { 
-                if(label.data.id.split("/").length !== 3) {
+            if(label.childrenLength > 50 || keyTo === "monthYear") { 
+                if(label.id.split("/").length !== 3) {
                     context.globalAlpha = easedPlabels;
                     context.font = `400 ${14*(fontScale)}px Guardian Text Sans Web`;
                     context.strokeStyle = "#ffffff";
                     context.textAlign = "center";
                     context.lineWidth = 3*fontScale
-                    context.strokeText(label.data.id, Math.round(label.x), Math.round(label.y + (fontScale*24)));
+                    context.strokeText(label.id, Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (fontScale*24) + yPadding));
 
                     // context.globalAlpha = easedPlabels;
                     context.font = `400 ${14*(fontScale)}px Guardian Text Sans Web`;
                     context.fillStyle = "#000"; 
                     context.textAlign = "center";
-                    context.fillText(label.data.id, Math.round(label.x), Math.round(label.y + (fontScale*24)));
-    
-                    // context.beginPath();
-                    // context.globalAlpha = easedPlabels;
-                    // context.strokeStyle = colours.neutral86;
-                    // context.lineWidth = 1; 
-                    // context.arc(label.x, label.y, label.r, 0, 2 * Math.PI);
-                    // // console.log(label.x, label.y, label.r)
-                    // context.stroke();
+                    context.fillText(label.id, Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (fontScale*24) + yPadding));
 
                     let childCount;
-                    if(keyTo === "monthYear") {
-                        // console.log("!!?!?!?!?!?")
-                        childCount = d3.sum(label.children, bn => bn.children.length);
-                    } else {
-                        childCount = label.children.length;
-                    }
+                    // if(keyTo === "monthYear") {
+                    //     // console.log("!!?!?!?!?!?")
+                    //     childCount = d3.sum(label.children, bn => bn.children.length);
+                    // } else {
+                        childCount = label.childrenLength;
+                    // }
                 
                     context.font = `500 ${26*(fontScale)}px Guardian Titlepiece`;
                     context.strokeStyle = "#ffffff";
                     context.textAlign = "center";
                     context.lineWidth = 3*fontScale
-                    context.strokeText(commafy(childCount), Math.round(label.x), Math.round(label.y + (4*fontScale)));
+                    context.strokeText(commafy(childCount), Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (4*fontScale) + yPadding));
 
                     context.font = `500 ${26*(fontScale)}px Guardian Titlepiece`;
                     context.fillStyle = "#000";
                     context.textAlign = "center";
-                    context.fillText(commafy(childCount), Math.round(label.x), Math.round(label.y + (4*fontScale)));
+                    context.fillText(commafy(childCount), Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (4*fontScale) + yPadding));
                 } else {
-                    if(label.children.length > 750 && width > 740) { 
+                    if(label.childrenLength > 750 && width > 740) { 
                         context.globalAlpha = easedPlabels;
                         context.font = `400 ${13*(fontScale)}px Guardian Text Sans Web`;
                         context.strokeStyle = "#ffffff";
                         context.textAlign = "center";
-                        context.lineWidth = 3*fontScale
-                        context.strokeText(Number(label.data.id.slice(0,2)) + " " + month(label.data.id.slice(3,5)), Math.round(label.x), Math.round(label.y + (fontScale*6)));
+                        context.lineWidth = 3*fontScale 
+                        context.strokeText(Number(label.id.slice(0,2)) + " " + month(label.id.slice(3,5)), Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (fontScale*6) + yPadding));
 
                         // context.globalAlpha = easedPlabels;
                         context.font = `400 ${13*(fontScale)}px Guardian Text Sans Web`;
                         context.fillStyle = "#000"; 
                         context.textAlign = "center";
-                        context.fillText(Number(label.data.id.slice(0,2)) + " " + month(label.data.id.slice(3,5)), Math.round(label.x), Math.round(label.y + (fontScale*6)));
+                        context.fillText(Number(label.id.slice(0,2)) + " " + month(label.id.slice(3,5)), Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (fontScale*6) + yPadding));
                     }
                 }
             }
         } 
-
         context.restore();
 
         if(p < 1) {
@@ -369,6 +312,11 @@ function interp(a,b,p) {
     return ((a*(1-p) + (b*(p))))
 }
 
+function interpXY(a,b,p) {
+    const ap = 1 - p;
+    return [((a.x*(ap) + (b.x*(p)))), ((a.y*(ap) + (b.y*(p))))]
+}
+
 function typeGenerator(d) {
     if(d.Sex.toUpperCase() === "Male".toUpperCase() && d.Child.toUpperCase() === "Yes".toUpperCase()) {
         return "Boys"
@@ -389,13 +337,8 @@ function typeGenerator(d) {
     return "NA"
 }
 
-d3.csv("<%= path %>/assets/data_1803_2.csv").then(function(data) {
-    render(data.filter(d => d.Year !== undefined).map(d => Object.assign({}, d, {
-        "name": Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-        "life": typeGenerator(d),
-        "monthYear": d.Month + " " + d.Year,
-        "injuredKilled": d.Fatal === "Yes" ? "Killed" : "Injured"
-    }))); 
+d3.json("<%= path %>/assets/civ_data.json").then(function(data) {
+    render(data); 
 
     d3.csv("<%= path %>/assets/out.csv").then((chartData) => {
         renderCharts(chartData);
@@ -418,51 +361,59 @@ const renderCharts = (chartDataRaw) => {
             title: "Percentage of drugs at zero stock levels",
             tickFormat: formatPercent,
             startAt: 0.25,
-            bigNumber: `<div><span>47%</span> on average in 2018</div>`
+            bigNumber: `<div><span>47%</span> on average in 2018</div>`,
+            words: `Gaza’s health system has all but collapsed, and the vast influx of casualties from the protests threatens to overwhelm it. The high number and gravity of the injuries have significantly depleted supplies. More than half of drugs are at “zero stock” levels, which means less than a month’s supply remains.`
         },
         {
             name: "Quality of wastewater flows into the sea (Effluent BOD mg/lt)*",
             title: "Quality of wastewater flows into the sea",
             tickFormat: null,
             startAt: 0,
-            bigNumber: `<div><span>232</span>mg/litre on average in 2018</div>`
+            bigNumber: `<div><span>232</span>mg/litre on average in 2018</div>`,
+            words: `Almost all of Gaza’s tap water is undrinkable, either tainted with sewage or salt water from the sea. Authorities have at times said they had to pump raw sewage into the sea.`
         },
         {
             name: "Total number of medical applications submitted to EREZ Crossings",
             title: "Medical applications for exit via Israel",
             tickFormat: null,
             startAt: 0,
-            bigNumber: `<div><span>39%</span>of medical applications denied in 2018</div>`
+            bigNumber: `<div><span>39%</span>of medical applications denied/delayed in 2018</div>`,
+            words: `While Gaza’s health system is unable to cope, Israel has prevented patients from entering for medical emergencies. Very few Palestinians in Gaza apply because they know they will be rejected. Those who do, have a high chance of being denied or having their applications delayed.`
         },
         {
             name: "Hours per day (electricity)",
             title: "Hours of electricity supplied per day",
             tickFormat: null,
             startAt: 0,
-            bigNumber: `<div><span>6.6</span>hours per day on average in 2018</div>`
+            bigNumber: `<div><span>6.6</span>hours per day on average in 2018</div>`,
+            words: `Gaza receives electricity from Israel and Egypt but it is paid for by the Palestinian Authority (PA) in the West Bank. A rivalry with Hamas has meant the PA has occasionally stopped payments to punish its political foes, leading to blackouts.`
         }, 
         {
             name: "GDP per capita",
             title: "GDP per capita",
             tickFormat: null,
             startAt: 340,
-            bigNumber: `<div><span>$X</span> per capita on average in 2018</div>`
+            bigNumber: `<div><span>$X</span> per capita on average in 2018</div>`,
+            words: `The economy in Gaza is collapsing, the World Bank has warned. Every second person lives in poverty and economic growth is negative. Foreign aid, recently cut by the Trump administration, is not enough to support life in the strip.`
         },
         {
             name: "Unemployment Rate /Youth",
             title: "Youth unemployment rate",
             tickFormat: formatPercent,
             startAt: 0.40,
-            bigNumber: `<div><span>52%</span>on average in 2018</div>`
+            bigNumber: `<div><span>52%</span>on average in 2018</div>`,
+            words: `Most young people in Gaza have never left. The Palestinian Central Bureau of Statistics says youth unemployment has reached 50%, but the World Bank puts the figure at around 70%.`
         }
     ]
 
     const nestedData = d3.nest().key(d => d.Indicator).entries(chartDataRaw);
 
-    const chartHeight = 200;
-    const chartWidth = 400;
+    const els = [].slice.apply(document.querySelectorAll(".line-wrapper"));
 
-    charts.forEach(chartObj => {
+    const chartHeight = 200;
+    const chartWidth = els[0].clientWidth;
+
+    charts.forEach((chartObj, i) => {
         const chart = chartObj.name;
         const chartTitle = chartObj.title;
         let chartData = (nestedData.find(d => d.key === chart)).values
@@ -474,16 +425,16 @@ const renderCharts = (chartDataRaw) => {
             // (nestedData.find(d => d.key === "% of denied and delayed permits to cross EREZ")).values;
         }
         
-        const el = d3.select(".line-charts").append("div").classed("line-wrapper", true);
+        const el = d3.select(els[i]).select(".inner");
 
-        el.append("h3").text(chartTitle)
+        // el.append("h3").text(chartTitle)
         el.append("div").classed("big-number", true).html(chartObj.bigNumber)
 
         const svg = el.append("svg")
             .attr("height", chartHeight)
             .attr("width", chartWidth);
 
-        el.append("p").text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean eget dui nunc. Sed et odio at lorem blandit sagittis nec id ex. Proin nunc purus, vehicula finibus felis scelerisque, pellentesque malesuada mi. Aenean a neque id turpis hendrerit tincidunt et a sem. ");
+        // el.append("p").text(chartObj.words);
  
         const defs = svg.append("defs");
 
@@ -611,7 +562,7 @@ const renderCharts = (chartDataRaw) => {
             svg.append("text")
                 .attr("x", 50)
                 .attr("y", yScale(1500) + 12)
-                .text("Rejected applications")
+                .text("Denied/delayed applications")
                 .style("fill", "#767676")
         }
 
