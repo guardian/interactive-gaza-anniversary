@@ -14,7 +14,7 @@ const padding = 0.25;
 
 let labels = {};
 
-const csvData = fs.readFileSync("./src/assets/data_1803_2.csv", "utf-8");
+const csvData = fs.readFileSync("./src/assets/final_1.csv", "utf-8");
 
 const keys = ["injuredKilled", "life", "monthYear", "Weapon"]
 
@@ -22,7 +22,7 @@ const data = csvjson.toObject(csvData).filter(d => d.Year !== undefined).map(d =
     "name": Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
     "life": typeGenerator(d),
     "monthYear": d.Month + " " + d.Year,
-    "injuredKilled": d.Fatal === "Yes" ? "Killed" : "Injured"
+    "injuredKilled": d.Casualty === "Fatality" ? "Killed" : "Injured"
 }))
 
 function typeGenerator(d) {

@@ -30,11 +30,15 @@ const height = scaledHeight/pixelRatio;
 
 const circleScaler = Math.min((width/1300), (height/1008))
 
-let yPadding = 0;
+let yPadding = (-40)*(circleScaler); 
 let xPadding = 0;
 
 if(height > circleScaler*1040) {
     yPadding = Math.round((height - (circleScaler*1040))/2);
+}
+
+if(width > circleScaler*1300) {
+    xPadding = Math.round((width - (circleScaler*1300))/2);
 }
 
 const r = 2 * (circleScaler);
@@ -204,7 +208,7 @@ function drawNext(keyFrom, keyTo) {
             fatalData[i].x = interp(fatalData[i].layout[keyFrom].x, fatalData[i].layout[keyTo].x, easedP);
             fatalData[i].y = interp(fatalData[i].layout[keyFrom].y, fatalData[i].layout[keyTo].y, easedP);
  
-            context.rect(fatalData[i].x * (circleScaler), (fatalData[i].y * (circleScaler)) + yPadding, r, r);
+            context.rect((fatalData[i].x * (circleScaler)) + xPadding, (fatalData[i].y * (circleScaler)) + yPadding, r, r);
         }
         context.fill();
         context.closePath();
@@ -224,7 +228,7 @@ function drawNext(keyFrom, keyTo) {
 
             const interped = interpXY(injuredData[i].layout[keyFrom], injuredData[i].layout[keyTo], easedP)
             
-            context.rect(interped[0]* (circleScaler), (interped[1]* (circleScaler)) + yPadding, r, r);
+            context.rect((interped[0]* (circleScaler)) + xPadding, (interped[1]* (circleScaler)) + yPadding, r, r);
         }
         context.fill();
         context.closePath();
@@ -238,13 +242,13 @@ function drawNext(keyFrom, keyTo) {
                     context.strokeStyle = "#ffffff";
                     context.textAlign = "center";
                     context.lineWidth = 3*fontScale
-                    context.strokeText(label.id, Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (fontScale*24) + yPadding));
+                    context.strokeText(label.id, Math.round(label.x* (circleScaler)) + xPadding, Math.round(label.y* (circleScaler) + (fontScale*24) + yPadding));
 
                     // context.globalAlpha = easedPlabels;
                     context.font = `400 ${14*(fontScale)}px Guardian Text Sans Web`;
                     context.fillStyle = "#000"; 
                     context.textAlign = "center";
-                    context.fillText(label.id, Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (fontScale*24) + yPadding));
+                    context.fillText(label.id, Math.round(label.x* (circleScaler)) + xPadding, Math.round(label.y* (circleScaler) + (fontScale*24) + yPadding));
 
                     let childCount;
                     // if(keyTo === "monthYear") {
@@ -258,12 +262,12 @@ function drawNext(keyFrom, keyTo) {
                     context.strokeStyle = "#ffffff";
                     context.textAlign = "center";
                     context.lineWidth = 3*fontScale
-                    context.strokeText(commafy(childCount), Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (4*fontScale) + yPadding));
+                    context.strokeText(commafy(childCount), Math.round(label.x* (circleScaler)) + xPadding, Math.round(label.y* (circleScaler) + (4*fontScale) + yPadding));
 
                     context.font = `500 ${26*(fontScale)}px Guardian Titlepiece`;
                     context.fillStyle = "#000";
                     context.textAlign = "center";
-                    context.fillText(commafy(childCount), Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (4*fontScale) + yPadding));
+                    context.fillText(commafy(childCount), Math.round(label.x* (circleScaler)) + xPadding, Math.round(label.y* (circleScaler) + (4*fontScale) + yPadding));
                 } else {
                     if(label.childrenLength > 750 && width > 740) { 
                         context.globalAlpha = easedPlabels;
@@ -271,13 +275,13 @@ function drawNext(keyFrom, keyTo) {
                         context.strokeStyle = "#ffffff";
                         context.textAlign = "center";
                         context.lineWidth = 3*fontScale 
-                        context.strokeText(Number(label.id.slice(0,2)) + " " + month(label.id.slice(3,5)), Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (fontScale*6) + yPadding));
+                        context.strokeText(Number(label.id.slice(0,2)) + " " + month(label.id.slice(3,5)), Math.round(label.x* (circleScaler)) + xPadding, Math.round(label.y* (circleScaler) + (fontScale*6) + yPadding));
 
                         // context.globalAlpha = easedPlabels;
                         context.font = `400 ${13*(fontScale)}px Guardian Text Sans Web`;
                         context.fillStyle = "#000"; 
                         context.textAlign = "center";
-                        context.fillText(Number(label.id.slice(0,2)) + " " + month(label.id.slice(3,5)), Math.round(label.x* (circleScaler)), Math.round(label.y* (circleScaler) + (fontScale*6) + yPadding));
+                        context.fillText(Number(label.id.slice(0,2)) + " " + month(label.id.slice(3,5)), Math.round(label.x* (circleScaler)) + xPadding, Math.round(label.y* (circleScaler) + (fontScale*6) + yPadding));
                     }
                 }
             }
