@@ -18,10 +18,15 @@ const csvData = fs.readFileSync("./src/assets/final_1.csv", "utf-8");
 
 const keys = ["injuredKilled", "life", "monthYear", "Weapon"]
 
-const data = csvjson.toObject(csvData).filter(d => d.Year !== undefined).map(d => Object.assign({}, d, {
+const genMonthYear = (date) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return months[Number(date.substring(3,5)) - 1] + " 20" + date.substring(6,8)
+}
+
+const data = csvjson.toObject(csvData).filter(d => d.date !== undefined).map(d => Object.assign({}, d, {
     "name": Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
     "life": typeGenerator(d),
-    "monthYear": d.Month + " " + d.Year,
+    "monthYear": genMonthYear(d.date),
     "injuredKilled": d.Casualty === "Fatality" ? "Killed" : "Injured"
 }))
 
@@ -56,15 +61,15 @@ const layouts = keys.map(key => {
         headers.push({"name": v.key, "value": "root"});
     });
 
-    if(key === "monthYear") {
-        (d3.nest().key(d => d["Date"]).entries(data)).forEach(v => {
-            headers.push({"name": v.key, "value": v.values[0].monthYear})
-        });
-    }
+    // if(key === "monthYear") {
+    //     (d3.nest().key(d => d["date"]).entries(data)).forEach(v => {
+    //         headers.push({"name": v.key, "value": v.values[0].monthYear})
+    //     });
+    // }
 
     const hierarchyData = d3.stratify()
         .id((d, i) => d.name)
-        .parentId((d, i) => (d.value) ? d.value : (key === "monthYear") ? d["Date"] : d[keyToNestBy])(headers.concat(d3.shuffle(data).filter(v => v.Month !== undefined))); 
+        .parentId((d, i) => (d.value) ? d.value : d[keyToNestBy])(headers.concat(d3.shuffle(data).filter(v => v.date !== undefined))); 
 
         // .parentId((d, i) => (d.value) ? d.value : d.Weapon)(headers.concat(data.filter(v => v.Month !== undefined))); 
     const pack = d3.pack()
@@ -76,25 +81,25 @@ const layouts = keys.map(key => {
 
     const leaves = pack.leaves();
 
-    if(key === "monthYear") {
-        labels[key] = [];
-        pack.children.forEach((c) => {
-            labels[key] = labels[key].concat(c.children)
-        }); 
-        labels[key] = labels[key].concat(pack.children);
-    } else {
+    // if(key === "monthYear") {
+    //     labels[key] = [];
+    //     pack.children.forEach((c) => {
+    //         labels[key] = labels[key].concat(c.children)
+    //     }); 
+    //     labels[key] = labels[key].concat(pack.children);
+    // } else {
         labels[key] = pack.children;
-    }
+    // }
 
     labels[key].forEach(d => {
         // console.log(d.data);
         d.id = d.data.id;
 
-        if(key === "monthYear") {
-            d.childrenLength = d3.sum(d.children, bn => bn.value);
-        } else {
+        // if(key === "monthYear") {
+            // d.childrenLength = d3.sum(d.children, bn => bn.value);
+        // } else {
             d.childrenLength = d.children.length;
-        }
+        // }
 
         // d.childrenLength = d.children.length;
 
