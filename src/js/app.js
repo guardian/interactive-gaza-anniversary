@@ -1,3 +1,9 @@
+import 'unfetch/polyfill'
+
+if(!window.fetch) {
+    window.fetch = fetch;
+}
+
 import * as d3Array from "d3-array"
 import * as d3Select from "d3-selection"
 import * as d3Scale from "d3-scale"

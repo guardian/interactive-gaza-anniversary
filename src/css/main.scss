@@ -23,7 +23,7 @@ html,body {
     display: block !important;
 }
 
-h1 {
+.headline-wrapper {
     @include fs-header(5);
     // font-weight: 900;
     // font-size: 42px;
@@ -31,17 +31,17 @@ h1 {
     padding-left: 10px;
     margin-left: 10px;
 
-    span {
+    h1 {
         color: #fff;
         display: inline;
         padding-bottom: .1em;
         background: linear-gradient(#121212, #121212) no-repeat;
         box-shadow: 6px 0 0 #121212, -12px 0 0 #121212;
-        font-size: 56px;
+        font-size: 48px;
         line-height: 1.34;
 
         @include mq($until: tablet) {
-            font-size: 42px;
+            font-size: 38px;
         }
 
         @include mq(wide) {
@@ -83,12 +83,12 @@ h3 {
 
 
 .standfirst {
-    font-size: 16px;
+    font-size: 1px;
     line-height: 20px;
     font-family: "Guardian Headline","Guardian Egyptian Web","Guardian Headline Full",Georgia,serif;
     font-weight: normal;
-    font-size: 22px;
-    line-height: 31px;
+    font-size: 20px;
+    line-height: 28px;
     display: block;
     margin-top: 4px;
     // margin-bottom: 12px;
@@ -173,7 +173,7 @@ h3 {
         max-width: 1300px;
     }
 
-    p, h1,h2, .int-byline {
+    p, .headline-wrapper,h2, .int-byline {
         padding-left: 10px;
         padding-right: 10px;
 
@@ -196,7 +196,9 @@ h3 {
 
     }
 
-    h1 {
+    .headline-wrapper {
+        max-width: 680px !important;
+        width: auto;
         padding: 0;
     }
 }
@@ -214,7 +216,6 @@ h3 {
     }
     min-height: 48px;
     // border-top: 1px solid #dcdcdc;
-    border-bottom: 1px solid #dcdcdc;
     // padding-top: 2px !important;
     margin-bottom: 6px;
     // background-image: repeating-linear-gradient(to bottom, #dcdcdc, #dcdcdc 0.0625rem, transparent 0.0625rem, transparent 0.25rem);
@@ -608,4 +609,59 @@ h3 {
     .domain {
         stroke: #dcdcdc;
     }
+}
+
+
+// share
+
+.od-share__button {
+    height: 30px;
+    width: 30px;
+    border-radius: 20px;
+    float: left;
+    margin-right: 4px;
+    border: 1px solid $news-red;
+
+    &:hover {
+        background-color: $news-red;
+
+        .od-share__icon {
+            fill: $neutral-100;
+        }
+    }
+}
+
+.od-share__icon {
+    fill: $news-red;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+}
+
+
+.od-share {
+    z-index: 2;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+    // margin-top: 6px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+
+
+    display: block;
+    border-top: 1px solid #dcdcdc;
+    padding-top: 6px;
+    margin-top: 6px;
+    // position: absolute;
+    // bottom: -38px;
+    // left: 0;
+
+    // @include mq($until: tablet) {
+    //     right: none;
+    //     left: 0;
+    //     bottom: -38px;
+    // }
+
 }
